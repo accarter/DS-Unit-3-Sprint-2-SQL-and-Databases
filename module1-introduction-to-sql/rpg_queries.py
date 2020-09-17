@@ -24,7 +24,7 @@ def query_2():
   """
   Determines the number of Characters for each character subclass.
   """
-  
+
   def query_subclass(subclass):
     """
     Determines the number of Characters for the specified subclass.
@@ -59,18 +59,27 @@ def query_3():
 # How many of the Items are weapons? How many are not?
 def query_4():
   """
-  Determines the number of Items that are Weapons.
+  Determines the number of Items that are Weapons
+  and the number of Items that are not Weapons.
   """
 
   query_weapon_count = """
   SELECT 
     COUNT(*) 
-  FROM armory_item 
-  JOIN armory_weapon 
-  ON armory_item.item_id = armory_weapon.item_ptr_id
+  FROM armory_weapon
   """
 
-  return database.execute(query_weapon_count).fetchone()[0]
+  query_non_weapon_count = """
+  SELECT 
+    COUNT(*) 
+  FROM armory_item 
+  LEFT JOIN armory_weapon 
+  ON armory_item.item_id = armory_weapon.item_ptr_id
+  WHERE armory_weapon.item_ptr_id IS NULL
+  """
+
+  return [database.execute(query).fetchone()[0] 
+    for query in (query_weapon_count, query_non_weapon_count)]
 
 
 # How many Items does each character have? (Return first 20 rows)
@@ -183,6 +192,10 @@ def display_subclasses(subclasses):
     print('{0:13} {1}'.format(f'{subclass.capitalize()}s:', count))
 
 
+def display_item_counts(item_counts):
+  print('Weapons:', item_counts[0])
+  print('Non-Weapons:', item_counts[1])
+
 def display_counts(counts):
   for char_id, count in counts:
     print('character_id {0:2d}:{1:2d}'.format(char_id, count))
@@ -203,7 +216,8 @@ QUERY_TITLES = ['number of characters',
 
 
 DISPLAY_FUNCS = {
-  2: display_subclasses, 
+  2: display_subclasses,
+  4: display_item_counts, 
   5: display_counts,
   6: display_counts,
   7: display_avg,
