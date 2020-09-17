@@ -137,12 +137,9 @@ def query_7():
     AVG(item_counts)
   FROM (
     SELECT
-      characters.character_id,
       COUNT(item_id) as item_counts
-    FROM charactercreator_character as characters
-    LEFT JOIN charactercreator_character_inventory as inventory
-    ON characters.character_id = inventory.character_id
-    GROUP BY characters.character_id)
+    FROM charactercreator_character_inventory
+    GROUP BY character_id)
   """
 
   return database.execute(query_avg_items).fetchone()[0]
@@ -159,7 +156,6 @@ def query_8():
     AVG(weapon_counts)
   FROM (
     SELECT
-      characters.character_id,
       COUNT(armory.item_ptr_id) as weapon_counts
     FROM charactercreator_character as characters
     LEFT JOIN charactercreator_character_inventory as inventory 
