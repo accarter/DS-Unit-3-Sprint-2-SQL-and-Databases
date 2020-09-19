@@ -102,3 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# sandbox
+module2-sql-for-analysis/sandbox.py

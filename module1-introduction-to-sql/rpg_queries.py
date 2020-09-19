@@ -25,20 +25,20 @@ def query_2():
   Determines the number of Characters for each character subclass.
   """
 
-  def query_subclass(subclass):
-    """
-    Determines the number of Characters for the specified subclass.
-    """
-    query = query_character_subclass_count.format(subclass)
-    return database.execute(query).fetchone()[0]
-
   query_character_subclass_count = """
-  SELECT 
-    COUNT(*)
-  FROM charactercreator_{0}
+  SELECT
+    COUNT(DISTINCT charactercreator_cleric.character_ptr_id),
+    COUNT(DISTINCT charactercreator_fighter.character_ptr_id),
+    COUNT(DISTINCT charactercreator_mage.character_ptr_id),
+    COUNT(DISTINCT charactercreator_thief.character_ptr_id)
+  FROM 
+    charactercreator_cleric,
+    charactercreator_fighter,
+    charactercreator_mage,
+    charactercreator_thief
   """
 
-  return [(sc, query_subclass(sc)) for sc in CHARACTER_SUBCLASSES]
+  return database.execute(query_character_subclass_count).fetchall()
     
 
 # How many total Items?
@@ -223,5 +223,6 @@ DISPLAY_FUNCS = {
 
 if __name__ == '__main__':
   database = sqlite3.connect("rpg_db.sqlite3")
-  for i, title in enumerate(QUERY_TITLES, 1):
-    display_answer(title, eval(f'query_{i}()'), DISPLAY_FUNCS.get(i, None))
+  print(query_8())
+  # for i, title in enumerate(QUERY_TITLES, 1):
+  #   display_answer(title, eval(f'query_{i}()'), DISPLAY_FUNCS.get(i, None))
