@@ -6,9 +6,6 @@ from dotenv import load_dotenv
 class ElephantPipeline:
 
   def __init__(self):
-    self._init_el_conn()
-
-  def _init_el_conn(self):
     # Load .env file and get credentials
     load_dotenv()
     DB_NAME = os.getenv("DB_NAME")
@@ -36,26 +33,30 @@ class ElephantPipeline:
 
 
   @staticmethod
-  def to_tuple(row):
-    return "(" + ", ".join(
-      "'{}'".format(col.replace("'", "''")) for col in row) + ")"
+  def to_sql_value(val):
+    return "'" + val.replace("'", "''") + "'"
 
-  def insert_rows(self, table_name, columns, rows):
+
+  @staticmethod
+  def to_sql_row(row):
+    return "(" + ",".join(map(ElephantPipeline.to_sql_value, row)) + ")"
+
+
+  def insert_rows(self, table_name, col_names, rows):
     insert_query = """
     INSERT INTO {0}
       ({1})
     VALUES {2};
-    """.format(table_name, 
-    ",".join(columns.keys()), 
-    ",\n".join(map(lambda x: str(self.to_tuple(x)), rows)))
+    """.format(table_name,
+               ",".join(col_names), 
+               ",".join(map(ElephantPipeline.to_sql_row, rows)))
 
-    print(insert_query[:1000])
     self.cursor.execute(insert_query)
 
 
   def copy_table(self, table_name, columns, rows):
     self.create_table(table_name, columns)
-    self.insert_rows(table_name, columns, rows)
+    self.insert_rows(table_name, columns.keys(), rows)
     self.conn.commit()
 
 
