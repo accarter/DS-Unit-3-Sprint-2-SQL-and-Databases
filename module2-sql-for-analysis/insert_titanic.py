@@ -15,7 +15,11 @@ fieldnames = {
   'Fare': 'real'
 }
 
+table_name = 'titanic'
+
 with open('titanic.csv', 'r') as f:
   reader = csv.reader(f)
   header = next(reader)
-  ElephantPipeline().copy_table('titanic', fieldnames, reader)
+  pipeline = ElephantPipeline()
+  pipeline.drop_table(table_name)
+  pipeline.copy_table(table_name, fieldnames, reader)

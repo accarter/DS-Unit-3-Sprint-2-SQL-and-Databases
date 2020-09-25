@@ -42,6 +42,7 @@ class ElephantPipeline:
   def to_sql_value(val):
     return "'" + val.replace("'", "''") + "'"
 
+
   @staticmethod
   def to_sql_row(row):
     return "(" + ",".join(map(ElephantPipeline.to_sql_value, row)) + ")"
